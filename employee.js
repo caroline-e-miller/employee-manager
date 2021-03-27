@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const inquirer = require('inquirer');
 var AsciiTable = require('ascii-table');
 
 const connection = mysql.createConnection({
@@ -11,8 +12,8 @@ const connection = mysql.createConnection({
     user: 'root',
 
     // Be sure to update with your own MySQL password!
-    password: '',
-    database: 'employeeDB',
+    password: 'thisIsMySQL2021a2*',
+    database: 'employee_manageDB',
 });
 
 // view all employees / view employees by department / view all employees by manager / add employee / remove employee / update employee role / update employee manager
@@ -23,24 +24,27 @@ const startingQuestion = () => {
             name: 'startQuestion',
             type: 'list',
             message: 'What would you like to do?',
-            choices: ['View all employees', 'View employees by department', 'View employees by manager', 'Add employee', 'Remove employee', 'Update employee role', 'Update employee manager'],
+            choices: ['View all employees', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Remove employee'],
         })
+        // SWTICH CASE HERE
         .then((answer) => {
             // based on their answer, either call the bid or the post functions
             if (answer.startQuestion === 'View all employees') {
                 allEmployees();
-            } else if (answer.startQuestion === 'View employees by department') {
-                departmentEmployees();
-            } else if (answer.startQuestion === 'View employees by manager') {
-                managerEmployees();
-            } else if (answer.startQuestion === 'Add employee') {
-                addEmployee();
-            } else if (answer.startQuestion === 'Remove employee') {
-                removeEmployee();
-            } else if (answer.startQuestion === 'Update employee role') {
-                updateRole();
-            } else if (answer.startQuestion === 'Update employee manager') {
-                updateManager();
+            } else if (answer.startQuestion === 'View departments') {
+                departments();
+            } else if (answer.startQuestion === 'View roles') {
+                roles();
+                // } else if (answer.startQuestion === 'Add employee') {
+                //     addEmployee();
+                // } else if (answer.startQuestion === 'Add department') {
+                //     addDepartment();
+                // } else if (answer.startQuestion === 'Add role') {
+                //     addRole();
+                // } else if (answer.startQuestion === 'Update employee role') {
+                //     updateRole();
+                // } else if (answer.startQuestion === 'Remove employee') {
+                //     removeEmployee();
             } else {
                 connection.end();
             }
@@ -51,44 +55,51 @@ const allEmployees = () => {
     const query = connection.query(
         'SELECT * FROM employee', (err, res) => {
             if (err) throw err;
+            let table = new AsciiTable()
+            table
+                .setHeading('First Name', 'Last Name', 'Role ID', 'Manager ID')
+
             res.forEach(({ first_name, last_name, role_id, manager_id }) => {
-                console.log(`${first_name} | ${last_name} | ${role_id} | ${manager_id}`);
+                table.addRow(first_name, last_name, role_id, manager_id);
             })
+
+            console.log(table.toString())
+            inquirer.prompt([
+                {
+                    name: 'actionSelect',
+                    type: 'list',
+                    message: 'What would you like to do with the employee data?',
+                    choices: ['View all employees', 'Add employee', 'Update employee role', 'View employee by manager', 'Remove employee'],
+                }
+            ])
+                // SWITCH CASE HERE
+                .then((answer) => {
+                    // based on their answer, either call the bid or the post functions
+                    if (answer.actionSelect === 'View all employees') {
+                        allEmployees();
+                        // } else if (answer.startQuestion === 'View departments') {
+                        //     departments();
+                        // } else if (answer.startQuestion === 'View roles') {
+                        //     roles();
+                    } else if (answer.actionSelect === 'Add employee') {
+                        addEmployee();
+                        // } else if (answer.startQuestion === 'Add role') {
+                        //     addRole();
+                    } else if (answer.actionSelect === 'Update employee role') {
+                        updateRole();
+                    } else if (answer.actionSelect === 'Remove employee') {
+                        removeEmployee();
+                    } else if (answer.actionSelect === 'View employees by manager') {
+                        managerEmployees();
+                    } else {
+                        connection.end();
+                    }
+                });
         }
     );
     console.log(query.sql);
-    connection.end();
+    //connection.end();
 
-    inquirer.prompt([
-        {
-            name: 'actionSelect',
-            type: 'list',
-            message: 'What would you like to do with the employee data?',
-            choices: ['View all employees', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Remove employee'],
-        }
-    ])
-        .then((answer) => {
-            // based on their answer, either call the bid or the post functions
-            if (answer.startQuestion === 'View all employees') {
-                allEmployees();
-            } else if (answer.startQuestion === 'View departments') {
-                departments();
-            } else if (answer.startQuestion === 'View roles') {
-                roles();
-            } else if (answer.startQuestion === 'Add employee') {
-                addEmployee();
-            } else if (answer.startQuestion === 'Add department') {
-                addDepartment();
-            } else if (answer.startQuestion === 'Add role') {
-                addRole();
-            } else if (answer.startQuestion === 'Update employee role') {
-                updateRole();
-            } else if (answer.startQuestion === 'Remove employee') {
-                removeEmployee();
-            } else {
-                connection.end();
-            }
-        });
 }
 
 const departments = () => {
@@ -101,7 +112,21 @@ const departments = () => {
         }
     );
     console.log(query.sql);
-    connection.end();
+
+    inquirer.prompt([
+        {
+            name: 'addDepartment',
+            type: 'list',
+            message: 'Would you like to add a department?',
+            choices: ['Yes', 'No']
+        }
+    ]);
+    if (answer.addDepartment === 'Yes') {
+        addDepartment();
+    } else {
+        startingQuestion();
+    }
+    // connection.end();
 };
 
 const roles = () => {
@@ -114,7 +139,178 @@ const roles = () => {
         }
     );
     console.log(query.sql);
-    connection.end();
+
+
+    inquirer.prompt([
+        {
+            name: 'addRole',
+            type: 'list',
+            message: 'Would you like to add an employee role?',
+            choice: ['Yes', 'No']
+        }
+    ]);
+    if (answer.addRole === 'Yes') {
+        addRole();
+    } else {
+        startingQuestion();
+    }
+    // connection.end();
+};
+
+const addEmployee = () => {
+    inquirer
+        .prompt([
+            {
+                name: 'firstName',
+                type: 'input',
+                message: 'What is the first name of the employee you would like to add?',
+            },
+            {
+                name: 'lastName',
+                type: 'input',
+                message: 'What is the last name of the employee you would like to add?',
+            },
+            {
+                name: 'roleID',
+                type: 'input',
+                message: 'What is their role id?',
+            },
+            {
+                name: 'managerID',
+                type: 'input',
+                message: 'What is their manager id?',
+            },
+        ])
+        .then((answer) => {
+            // when finished prompting, insert a new item into the db with that info
+            connection.query(
+                'INSERT INTO employee SET ?',
+                // QUESTION: What does the || 0 do?
+                {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_id: answer.roleID,
+                    manager_id: answer.managerID
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log('You successfully added an employee!');
+                    // re-prompt the user for if they want to bid or post
+                    startingQuestion();
+                }
+            );
+        });
+}
+
+const addDepartment = () => {
+    inquirer
+        .prompt([
+            {
+                name: 'departmentName',
+                type: 'input',
+                message: 'What is the name of the department you would like to add?',
+            },
+        ])
+        .then((answer) => {
+            // when finished prompting, insert a new item into the db with that info
+            connection.query(
+                'INSERT INTO employee SET ?',
+                // QUESTION: What does the || 0 do?
+                {
+                    deparment_name: answer.departmentName
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log('You successfully added an employee!');
+                    // re-prompt the user for if they want to bid or post
+                    startingQuestion();
+                }
+            );
+        });
+}
+
+const updateRole = () => {
+    const query = connection.query(
+        'SELECT * FROM employee', (err, res) => {
+            if (err) throw err;
+            let table = new AsciiTable()
+            table
+                .setHeading('First Name', 'Last Name', 'Role ID', 'Manager ID')
+
+            res.forEach(({ first_name, last_name, role_id, manager_id }) => {
+                table.addRow(first_name, last_name, role_id, manager_id);
+            })
+
+            console.log(table.toString())
+            // 
+        })
+    inquirer.prompt([
+        {
+            name: 'employee',
+            type: 'number',
+            message: "Enter Employee ID"
+        },
+        {
+            name: 'newRole',
+            type: 'number',
+            message: "What is the employee's updated role ID?"
+        }
+    ]).then(answer => {
+
+        console.log('Updating employees...\n');
+        const query = connection.query(
+            'UPDATE employee SET ? WHERE ?',
+            [
+                {
+                    role_id: answer.newRole,
+                },
+            ], { id: answer.employee },
+            (err, res) => {
+                if (err) throw err;
+                console.log(`${res.affectedRows} employee information updated!\n`);
+                startingQuestion();
+            }
+        );
+    })
+};
+
+const removeEmployee = () => {
+    inquirer.prompt([
+        {
+            name: 'removeFirstName',
+            type: 'input',
+            message: 'What is the first name of the employee you would like to remove?'
+        },
+        {
+            name: 'removeLastName',
+            type: 'input',
+            message: 'What is the last name of the employee you would like to remove?'
+        }
+    ])
+    console.log('Deleting all strawberry icecream...\n');
+    connection.query(
+        'DELETE FROM employee WHERE ?',
+        {
+            first_name: answer.removeFirstName,
+            last_name: answer.removeLastName
+        },
+        (err, res) => {
+            if (err) throw err;
+            console.log(`${res.affectedRows} products deleted!\n`);
+            // Call readProducts AFTER the DELETE completes
+            readProducts();
+        }
+    );
+};
+
+const managerEmployees = () => {
+    inquirer
+        .prompt({
+            name: 'managerChoice',
+            type: 'input',
+            message: "What manager's employees would you like?",
+        })
+
 };
 
 // const queryAllEmployeeData = () => {
