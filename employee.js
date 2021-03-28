@@ -1,3 +1,5 @@
+// write addRole function
+// ask about undeveloped 'no'
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 var AsciiTable = require('ascii-table');
@@ -166,9 +168,8 @@ const roles = () => {
                 console.log(`${role_id}`);
             })
         }
-    );
-    console.log(query.sql);
-
+    )
+    console.log(query.sql)
 
     inquirer
         .prompt([
@@ -176,14 +177,33 @@ const roles = () => {
                 name: 'addRole',
                 type: 'list',
                 message: 'Would you like to add an employee role?',
-                choice: ['Yes', 'No']
+                choices: ['Yes', 'No']
             }
-        ]);
-    if (answer.addRole === 'Yes') {
-        addRole();
-    } else {
-        startingQuestion();
-    }
+        ])
+        .then((answer) => {
+            // when finished prompting, insert a new item into the db with that info
+            if (answer.addRole === 'Yes') {
+                addRoles();
+            } else {
+                startingQuestion();
+            }
+        });
+
+
+    // inquirer
+    //     .prompt([
+    //         {
+    //             name: 'addRole',
+    //             type: 'list',
+    //             message: 'Would you like to add an employee role?',
+    //             choice: ['Yes', 'No']
+    //         }
+    //     ]);
+    // if (answer.addRole === 'Yes') {
+    //     addRole();
+    // } else {
+    //     startingQuestion();
+    // }
     // connection.end();
 };
 
@@ -259,6 +279,34 @@ const addDepartment = () => {
         });
 }
 
+const addRoles = () => {
+    inquirer
+        .prompt([
+            {
+                name: 'roleName',
+                type: 'input',
+                message: 'What is the name of the role you would like to add?',
+            },
+        ])
+        .then((answer) => {
+            // when finished prompting, insert a new item into the db with that info
+            connection.query(
+                'INSERT INTO role SET ?',
+                // QUESTION: What does the || 0 do?
+                {
+                    title: answer.roleName
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log('You successfully added a role!');
+                    // re-prompt the user for if they want to bid or post
+                    startingQuestion();
+                }
+            );
+        });
+};
+
+
 const updateRole = () => {
     const query = connection.query(
         'SELECT * FROM employee', (err, res) => {
@@ -286,25 +334,26 @@ const updateRole = () => {
             type: 'number',
             message: "What is the employee's updated role ID?"
         }
-    ]).then(answer => {
+    ])
+        .then((answer) => {
 
-        console.log('Updating employees...\n');
-        const query = connection.query(
-            'UPDATE employee SET ? WHERE ?',
-            [
-                {
-                    role_id: answer.newRole,
-                },
-            ], { id: answer.employee },
-            (err, res) => {
-                if (err) throw err;
-                console.log(`${res.affectedRows} employee information updated!\n`);
-                startingQuestion();
-                // console.log(query.sql);
+            console.log('Updating employees...\n');
+            connection.query(
+                'UPDATE employee SET ? WHERE ?',
+                [
+                    {
+                        role_id: answer.newRole,
+                    },
+                ], { id: answer.employee },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`${res.affectedRows} employee information updated!\n`);
+                    startingQuestion();
+                    // console.log(query.sql);
 
-            }
-        );
-    })
+                }
+            );
+        })
 };
 
 const removeEmployee = () => {
@@ -320,20 +369,39 @@ const removeEmployee = () => {
             message: 'What is the last name of the employee you would like to remove?'
         }
     ])
-    console.log('Deleting employee...\n');
-    connection.query(
-        'DELETE FROM employee WHERE ?',
-        {
-            first_name: answer.removeFirstName,
-            last_name: answer.removeLastName
-        },
-        (err, res) => {
-            if (err) throw err;
-            console.log(`${res.affectedRows} products deleted!\n`);
-            // Call readProducts AFTER the DELETE completes
-            readProducts();
-        }
-    );
+    console.log('Deleting employee...\n')
+
+        .then((answer) => {
+            // when finished prompting, insert a new item into the db with that info
+            connection.query(
+                'DELETE FROM employee WHERE ?',
+                {
+                    first_name: answer.removeFirstName,
+                    last_name: answer.removeLastName
+                },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`${res.affectedRows} employee deleted!\n`);
+                    // Call readProducts AFTER the DELETE completes
+                    readProducts();
+                }
+            );
+        });
+
+
+    // connection.query(
+    //     'DELETE FROM employee WHERE ?',
+    //     {
+    //         first_name: answer.removeFirstName,
+    //         last_name: answer.removeLastName
+    //     },
+    //     (err, res) => {
+    //         if (err) throw err;
+    //         console.log(`${res.affectedRows} products deleted!\n`);
+    //         // Call readProducts AFTER the DELETE completes
+    //         readProducts();
+    //     }
+    // );
 };
 
 // const managerEmployees = () => {
