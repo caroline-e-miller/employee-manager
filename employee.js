@@ -120,12 +120,41 @@ const departments = () => {
             message: 'Would you like to add a department?',
             choices: ['Yes', 'No']
         }
-    ]);
-    if (answer.addDepartment === 'Yes') {
-        addDepartment();
-    } else {
-        startingQuestion();
-    }
+    ])
+        .then((answer) => {
+            if (answer.addDepartment === 'Yes') {
+                return addDepartment();
+            } else {
+                return startingQuestion();
+            }
+            // based on their answer, either call the bid or the post functions
+            // if (answer.actionSelect === 'View all employees') {
+            //     allEmployees();
+            //     // } else if (answer.startQuestion === 'View departments') {
+            //     //     departments();
+            //     // } else if (answer.startQuestion === 'View roles') {
+            //     //     roles();
+            // } else if (answer.actionSelect === 'Add employee') {
+            //     addEmployee();
+            //     // } else if (answer.startQuestion === 'Add role') {
+            //     //     addRole();
+            // } else if (answer.actionSelect === 'Update employee role') {
+            //     updateRole();
+            // } else if (answer.actionSelect === 'Remove employee') {
+            //     removeEmployee();
+            // } else if (answer.actionSelect === 'View employees by manager') {
+            //     managerEmployees();
+            // } else {
+            //     connection.end();
+            // }
+        });
+
+
+    // if (answer.addDepartment === 'Yes') {
+    //     return addDepartment();
+    // } else {
+    //     return startingQuestion();
+    // }
     // connection.end();
 };
 
@@ -133,22 +162,23 @@ const roles = () => {
     const query = connection.query(
         'SELECT * FROM role', (err, res) => {
             if (err) throw err;
-            res.forEach(({ department_name }) => {
-                console.log(`${department_name}`);
+            res.forEach(({ role_id }) => {
+                console.log(`${role_id}`);
             })
         }
     );
     console.log(query.sql);
 
 
-    inquirer.prompt([
-        {
-            name: 'addRole',
-            type: 'list',
-            message: 'Would you like to add an employee role?',
-            choice: ['Yes', 'No']
-        }
-    ]);
+    inquirer
+        .prompt([
+            {
+                name: 'addRole',
+                type: 'list',
+                message: 'Would you like to add an employee role?',
+                choice: ['Yes', 'No']
+            }
+        ]);
     if (answer.addRole === 'Yes') {
         addRole();
     } else {
@@ -214,14 +244,14 @@ const addDepartment = () => {
         .then((answer) => {
             // when finished prompting, insert a new item into the db with that info
             connection.query(
-                'INSERT INTO employee SET ?',
+                'INSERT INTO department SET ?',
                 // QUESTION: What does the || 0 do?
                 {
-                    deparment_name: answer.departmentName
+                    department_name: answer.departmentName
                 },
                 (err) => {
                     if (err) throw err;
-                    console.log('You successfully added an employee!');
+                    console.log('You successfully added a department!');
                     // re-prompt the user for if they want to bid or post
                     startingQuestion();
                 }
