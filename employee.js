@@ -24,7 +24,7 @@ const startingQuestion = () => {
             name: 'startQuestion',
             type: 'list',
             message: 'What would you like to do?',
-            choices: ['View all employees', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Remove employee'],
+            choices: ['View all employees', 'View departments', 'View roles'],
         })
         // SWTICH CASE HERE
         .then((answer) => {
@@ -240,6 +240,7 @@ const updateRole = () => {
             res.forEach(({ first_name, last_name, role_id, manager_id }) => {
                 table.addRow(first_name, last_name, role_id, manager_id);
             })
+            console.log(query.sql);
 
             console.log(table.toString())
             // 
@@ -269,6 +270,8 @@ const updateRole = () => {
                 if (err) throw err;
                 console.log(`${res.affectedRows} employee information updated!\n`);
                 startingQuestion();
+                // console.log(query.sql);
+
             }
         );
     })
@@ -287,7 +290,7 @@ const removeEmployee = () => {
             message: 'What is the last name of the employee you would like to remove?'
         }
     ])
-    console.log('Deleting all strawberry icecream...\n');
+    console.log('Deleting employee...\n');
     connection.query(
         'DELETE FROM employee WHERE ?',
         {
@@ -303,15 +306,15 @@ const removeEmployee = () => {
     );
 };
 
-const managerEmployees = () => {
-    inquirer
-        .prompt({
-            name: 'managerChoice',
-            type: 'input',
-            message: "What manager's employees would you like?",
-        })
+// const managerEmployees = () => {
+//     inquirer
+//         .prompt({
+//             name: 'managerChoice',
+//             type: 'input',
+//             message: "What manager's employees would you like?",
+//         })
 
-};
+// };
 
 // const queryAllEmployeeData = () => {
 //     connection.query('SELECT * FROM employees', (err, res) => {
