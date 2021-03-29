@@ -93,17 +93,20 @@ const departments = () => {
             console.log(query.sql);
             console.log(departmentTable.toString())
 
-            inquirer.prompt([
-                {
-                    name: 'addDepartment',
-                    type: 'list',
-                    message: 'Would you like to add a department?',
-                    choices: ['Yes', 'No']
-                }
-            ])
+            inquirer
+                .prompt([
+                    {
+                        name: 'departmentChoice',
+                        type: 'list',
+                        message: 'What would you like to do?',
+                        choices: ['Add department', 'Delete department', 'Exit']
+                    }
+                ])
                 .then((answer) => {
-                    if (answer.addDepartment === 'Yes') {
+                    if (answer.departmentChoice === 'Add department') {
                         addDepartment();
+                    } else if (answer.departmentChoice === 'Delete department') {
+                        removeDepartment();
                     } else {
                         startingQuestion();
                     }
@@ -130,15 +133,17 @@ const roles = () => {
             inquirer
                 .prompt([
                     {
-                        name: 'addRole',
+                        name: 'roleChoice',
                         type: 'list',
-                        message: 'Would you like to add an employee role?',
-                        choices: ['Yes', 'No']
+                        message: 'What would you like to do?',
+                        choices: ['Add role', 'Delete role', 'Exit']
                     }
                 ])
                 .then((answer) => {
-                    if (answer.addRole === 'Yes') {
+                    if (answer.roleChoice === 'Add role') {
                         addRoles();
+                    } else if (answer.roleChoice === 'Delete role') {
+                        removeRole();
                     } else {
                         startingQuestion();
                     }
@@ -320,6 +325,56 @@ const removeEmployee = () => {
                 (err, res) => {
                     if (err) throw err;
                     console.log(`${res.affectedRows} employee deleted!\n`);
+                    startingQuestion();
+                }
+            );
+        });
+};
+
+const removeRole = () => {
+    inquirer.prompt([
+        {
+            name: 'removeTitle',
+            type: 'input',
+            message: 'What is the title of the role you would like to remove?'
+        },
+    ])
+        .then((answer) => {
+
+            console.log('Deleting role...\n')
+            connection.query(
+                'DELETE FROM role WHERE ?',
+                {
+                    title: answer.removeTitle
+                },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`${res.affectedRows} role deleted!\n`);
+                    startingQuestion();
+                }
+            );
+        });
+};
+
+const removeDepartment = () => {
+    inquirer.prompt([
+        {
+            name: 'removeDepartment',
+            type: 'input',
+            message: 'What is the department you would like to remove?'
+        },
+    ])
+        .then((answer) => {
+
+            console.log('Deleting department...\n')
+            connection.query(
+                'DELETE FROM department WHERE ?',
+                {
+                    department_name: answer.removeDepartment
+                },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`${res.affectedRows} department deleted!\n`);
                     startingQuestion();
                 }
             );
