@@ -110,48 +110,62 @@ const departments = () => {
     const query = connection.query(
         'SELECT * FROM department', (err, res) => {
             if (err) throw err;
+            let departmentTable = new AsciiTable()
+            departmentTable
+                .setHeading('Department Name')
+
             res.forEach(({ department_name }) => {
-                console.log(`${department_name}`);
+                departmentTable.addRow(department_name);
             })
+            console.log(query.sql);
+            console.log(departmentTable.toString())
+
+            inquirer.prompt([
+                {
+                    name: 'addDepartment',
+                    type: 'list',
+                    message: 'Would you like to add a department?',
+                    choices: ['Yes', 'No']
+                }
+            ])
+                .then((answer) => {
+                    if (answer.addDepartment === 'Yes') {
+                        addDepartment();
+                    } else {
+                        startingQuestion();
+                    }
+                });
+
+            // console.log(departmentTable.toString())
+            // 'SELECT * FROM department', (err, res) => {
+            //     if (err) throw err;
+            //     res.forEach(({ department_name }) => {
+            //         console.log(`${department_name}`);
+            //     })
         }
     );
-    console.log(query.sql);
 
-    inquirer.prompt([
-        {
-            name: 'addDepartment',
-            type: 'list',
-            message: 'Would you like to add a department?',
-            choices: ['Yes', 'No']
-        }
-    ])
-        .then((answer) => {
-            if (answer.addDepartment === 'Yes') {
-                return addDepartment();
-            } else {
-                return startingQuestion();
-            }
-            // based on their answer, either call the bid or the post functions
-            // if (answer.actionSelect === 'View all employees') {
-            //     allEmployees();
-            //     // } else if (answer.startQuestion === 'View departments') {
-            //     //     departments();
-            //     // } else if (answer.startQuestion === 'View roles') {
-            //     //     roles();
-            // } else if (answer.actionSelect === 'Add employee') {
-            //     addEmployee();
-            //     // } else if (answer.startQuestion === 'Add role') {
-            //     //     addRole();
-            // } else if (answer.actionSelect === 'Update employee role') {
-            //     updateRole();
-            // } else if (answer.actionSelect === 'Remove employee') {
-            //     removeEmployee();
-            // } else if (answer.actionSelect === 'View employees by manager') {
-            //     managerEmployees();
-            // } else {
-            //     connection.end();
-            // }
-        });
+    // based on their answer, either call the bid or the post functions
+    // if (answer.actionSelect === 'View all employees') {
+    //     allEmployees();
+    //     // } else if (answer.startQuestion === 'View departments') {
+    //     //     departments();
+    //     // } else if (answer.startQuestion === 'View roles') {
+    //     //     roles();
+    // } else if (answer.actionSelect === 'Add employee') {
+    //     addEmployee();
+    //     // } else if (answer.startQuestion === 'Add role') {
+    //     //     addRole();
+    // } else if (answer.actionSelect === 'Update employee role') {
+    //     updateRole();
+    // } else if (answer.actionSelect === 'Remove employee') {
+    //     removeEmployee();
+    // } else if (answer.actionSelect === 'View employees by manager') {
+    //     managerEmployees();
+    // } else {
+    //     connection.end();
+    // }
+
 
 
     // if (answer.addDepartment === 'Yes') {
@@ -166,9 +180,17 @@ const roles = () => {
     const query = connection.query(
         'SELECT * FROM role', (err, res) => {
             if (err) throw err;
-            res.forEach(({ title }) => {
-                console.log(`${title}`);
+            let rolesTable = new AsciiTable()
+            rolesTable
+                .setHeading('Title', 'Salary', 'Department ID')
+
+            res.forEach(({ title, salary, department_id }) => {
+                rolesTable.addRow(title, salary, department_id);
             })
+            console.log(query.sql);
+
+            console.log(rolesTable.toString());
+            // put code below here
         }
     )
     console.log(query.sql)
@@ -374,9 +396,9 @@ const removeEmployee = () => {
             message: 'What is the last name of the employee you would like to remove?'
         }
     ])
-    console.log('Deleting employee...\n')
-
         .then((answer) => {
+
+            console.log('Deleting employee...\n')
             // when finished prompting, insert a new item into the db with that info
             connection.query(
                 'DELETE FROM employee WHERE ?',
