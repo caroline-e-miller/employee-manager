@@ -190,28 +190,46 @@ const roles = () => {
             console.log(query.sql);
 
             console.log(rolesTable.toString());
+
+            inquirer
+                .prompt([
+                    {
+                        name: 'addRole',
+                        type: 'list',
+                        message: 'Would you like to add an employee role?',
+                        choices: ['Yes', 'No']
+                    }
+                ])
+                .then((answer) => {
+                    // when finished prompting, insert a new item into the db with that info
+                    if (answer.addRole === 'Yes') {
+                        addRoles();
+                    } else {
+                        startingQuestion();
+                    }
+                });
             // put code below here
         }
     )
-    console.log(query.sql)
+    // console.log(query.sql)
 
-    inquirer
-        .prompt([
-            {
-                name: 'addRole',
-                type: 'list',
-                message: 'Would you like to add an employee role?',
-                choices: ['Yes', 'No']
-            }
-        ])
-        .then((answer) => {
-            // when finished prompting, insert a new item into the db with that info
-            if (answer.addRole === 'Yes') {
-                addRoles();
-            } else {
-                startingQuestion();
-            }
-        });
+    // inquirer
+    //     .prompt([
+    //         {
+    //             name: 'addRole',
+    //             type: 'list',
+    //             message: 'Would you like to add an employee role?',
+    //             choices: ['Yes', 'No']
+    //         }
+    //     ])
+    //     .then((answer) => {
+    //         // when finished prompting, insert a new item into the db with that info
+    //         if (answer.addRole === 'Yes') {
+    //             addRoles();
+    //         } else {
+    //             startingQuestion();
+    //         }
+    //     });
 
 
     // inquirer
