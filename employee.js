@@ -1,4 +1,6 @@
-// write addRole function
+// switch cases
+// add tables to everywhere
+
 // ask about undeveloped 'no'
 const mysql = require('mysql');
 const inquirer = require('inquirer');
@@ -71,7 +73,7 @@ const allEmployees = () => {
                     name: 'actionSelect',
                     type: 'list',
                     message: 'What would you like to do with the employee data?',
-                    choices: ['View all employees', 'Add employee', 'Update employee role', 'View employee by manager', 'Remove employee'],
+                    choices: ['View all employees', 'Add employee', 'Update employee role', 'Remove employee'],
                 }
             ])
                 // SWITCH CASE HERE
@@ -164,8 +166,8 @@ const roles = () => {
     const query = connection.query(
         'SELECT * FROM role', (err, res) => {
             if (err) throw err;
-            res.forEach(({ role_id }) => {
-                console.log(`${role_id}`);
+            res.forEach(({ title }) => {
+                console.log(`${title}`);
             })
         }
     )
@@ -344,7 +346,10 @@ const updateRole = () => {
                     {
                         role_id: answer.newRole,
                     },
-                ], { id: answer.employee },
+                    {
+                        role_id: answer.employee
+                    }
+                ],
                 (err, res) => {
                     if (err) throw err;
                     console.log(`${res.affectedRows} employee information updated!\n`);
