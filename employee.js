@@ -329,6 +329,16 @@ const addRoles = () => {
                 type: 'input',
                 message: 'What is the name of the role you would like to add?',
             },
+            {
+                name: 'roleSalary',
+                type: 'input',
+                message: 'What is the salary you would like to add?',
+            },
+            {
+                name: 'roleDepartment',
+                type: 'input',
+                message: 'What is the department ID you would like to add?',
+            },
         ])
         .then((answer) => {
             // when finished prompting, insert a new item into the db with that info
@@ -336,7 +346,9 @@ const addRoles = () => {
                 'INSERT INTO role SET ?',
                 // QUESTION: What does the || 0 do?
                 {
-                    title: answer.roleName
+                    title: answer.roleName,
+                    salary: answer.roleSalary,
+                    department_id: answer.roleDepartment
                 },
                 (err) => {
                     if (err) throw err;
@@ -369,7 +381,7 @@ const updateRole = () => {
         {
             name: 'employee',
             type: 'number',
-            message: "Enter Employee ID"
+            message: "Enter current employee ID"
         },
         {
             name: 'newRole',
@@ -404,15 +416,15 @@ const updateRole = () => {
 const removeEmployee = () => {
     inquirer.prompt([
         {
-            name: 'removeFirstName',
+            name: 'removeID',
             type: 'input',
-            message: 'What is the first name of the employee you would like to remove?'
+            message: 'What is the role ID of the employee you would like to remove?'
         },
-        {
-            name: 'removeLastName',
-            type: 'input',
-            message: 'What is the last name of the employee you would like to remove?'
-        }
+        // {
+        //     name: 'removeLastName',
+        //     type: 'input',
+        //     message: 'What is the last name of the employee you would like to remove?'
+        // }
     ])
         .then((answer) => {
 
@@ -421,14 +433,13 @@ const removeEmployee = () => {
             connection.query(
                 'DELETE FROM employee WHERE ?',
                 {
-                    first_name: answer.removeFirstName,
-                    last_name: answer.removeLastName
+                    role_id: answer.removeID
                 },
                 (err, res) => {
                     if (err) throw err;
                     console.log(`${res.affectedRows} employee deleted!\n`);
                     // Call readProducts AFTER the DELETE completes
-                    readProducts();
+                    startingQuestion();
                 }
             );
         });
