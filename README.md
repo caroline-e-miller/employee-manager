@@ -6,7 +6,7 @@ This application is designed to provide employers with an easy way to view, edit
 
 ## Installation
 
-First, install dependencies after running 'npm i' in your console and check that the seed data from mySQL will be used. Finally, type 'npm start' in the console to begin the application. 
+After pulling the repository, install dependencies after running 'npm i' in your console and confirm that MySQL database has the correct seed data and is ready for use. Finally, type 'npm start' in the console to begin the application. 
 
 ## Usage
 
