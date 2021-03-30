@@ -2,6 +2,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 var AsciiTable = require('ascii-table');
+require('dotenv').config();
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -10,7 +11,7 @@ const connection = mysql.createConnection({
 
     user: 'root',
 
-    password: 'thisIsMySQL2021a2*',
+    password: process.env.DB_PASSWORD,
     database: 'employee_manageDB',
 });
 
